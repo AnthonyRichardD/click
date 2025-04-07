@@ -1,4 +1,5 @@
 const { User } = require("../models");
+const jwt = require("jsonwebtoken");
 const hashPassword = require("../utils/hashPassword");
 const { Op } = require("sequelize");
 
@@ -39,6 +40,51 @@ class UserService {
     };
   }
 
+  async login({ email, password }) {
+    try {
+      const user = await User.findOne({ where: { email } });
+      
+      if (!user) {
+        return {
+          message: "E-mail ou senha inválidos!",
+          is_error: true,
+          statusCode: 401
+        };
+      }
+
+      const hashedPassword = hashPassword(password);
+      const validPassword = user.password === hashedPassword;
+      
+      if (!validPassword) {
+        return {
+          message: "E-mail ou senha inválidos!",
+          is_error: true,
+          statusCode: 401
+        };
+      }
+
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+      });
+
+      const userWithoutPassword = (({ password, ...rest }) => rest)(user.toJSON());
+
+      return {
+        response: { user: userWithoutPassword, token },
+        is_error: false,
+        statusCode: 200
+      };
+
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
+      return {
+        message: "Falha ao fazer login!",
+        is_error: true,
+        statusCode: 400
+      };
+    }
+  }
+
   async getUserById(id) {
     return await User.findByPk(id, {
       attributes: { exclude: ['password'] }
@@ -54,7 +100,6 @@ class UserService {
       };
     }
 
-    // Atualiza apenas os campos permitidos
     const allowedUpdates = ['totalPoints', 'pointsPerClick', 'pointsPerSecond', 'lastActiveAt'];
     const updatesToApply = {};
     
@@ -79,6 +124,7 @@ class UserService {
       raw: true
     });
   }
+  
 }
 
 module.exports = new UserService();
