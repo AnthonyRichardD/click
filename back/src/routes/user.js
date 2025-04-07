@@ -8,9 +8,6 @@ router.post("/login", UserController.login);
 
 router.use(authMiddleware);
 
-router.get("/list", UserController.index);
-router.get("/:id", UserController.show);
-router.put("/:id", UserController.update);
-router.delete("/:id", UserController.destroy);
+router.post("/save", UserController.save);
 
 module.exports = router;
