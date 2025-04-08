@@ -43,15 +43,13 @@ class Usercontrollers {
 
   async saveProgress(req, res) {
     try {
+      const userId = req.user.id;
       const { totalPoints, pointsPerClick, pointsPerSecond } = req.body;
-      const result = await UserService.saveProgress(
-        req.headers['authorization'],
-        {
-          totalPoints,
-          pointsPerClick,
-          pointsPerSecond,
-        }
-      );
+      const result = await UserService.saveProgress(userId, {
+        totalPoints,
+        pointsPerClick,
+        pointsPerSecond,
+      });
 
       return res.status(result.statusCode || 200).json(result);
     } catch (error) {
@@ -73,8 +71,7 @@ class Usercontrollers {
 
   async getProgress(req, res) {
     try {
-      const { userId } = req.user;
-
+      const userId = req.user.id;
       const result = await UserService.getProgress(userId);
 
       if (result.is_error) {

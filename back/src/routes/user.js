@@ -8,6 +8,6 @@ router.post('/login', UserController.login);
 
 router.use(authMiddleware);
 router.post('/save', UserController.saveProgress);
-router.get('/progress', UserController.getProgress);
+router.get('/progress/get', UserController.getProgress);
 
 module.exports = router;

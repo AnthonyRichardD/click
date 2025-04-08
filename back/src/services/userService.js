@@ -2,8 +2,6 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 
 const hashPassword = require('../utils/hashPassword');
-const { getToken, getUserIdByToken } = require('../utils/auth');
-
 const { Op } = require('sequelize');
 
 class UserService {
@@ -92,11 +90,8 @@ class UserService {
     }
   }
 
-  async saveProgress(headers, progressData) {
+  async saveProgress(userId, progressData) {
     try {
-      const token = await getToken(headers);
-      const userId = await getUserIdByToken(token);
-
       const user = await User.findByPk(userId);
 
       if (!user) {
